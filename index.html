@@ -35,7 +35,7 @@
 
   <!-- Header -->
   <header style="background:#2c3e50; color:#fff; padding:20px; text-align:center;">
-    <img src="https://cdn-icons-png.flaticon.com/512/235/235861.png" alt="RealPlot Logo" style="width:80px; height:auto; margin-bottom:10px;">
+    <img src="https://res.cloudinary.com/dwvt4e9o2/image/upload/v1752934492/ChatGPT_Image_Jul_19_2025_04_56_24_PM_jadg82.png" alt="RealPlot Logo" style="width:80px; height:auto; margin-bottom:10px;">
     <h1 style="margin:0; font-size:28px;">RealPlot Connect – Real Estate Blog</h1>
     <p style="margin:5px 0 0; font-size:16px;">Smart Property • Smart Investment • Smart Future</p>
   </header>
@@ -45,14 +45,24 @@
     <input id="searchBox" type="text" placeholder="🔍 Search property topics..." 
       style="width:60%; padding:10px; border:1px solid #ccc; border-radius:5px;">
 
-    <div style="margin-top:10px; text-align:center;">
-      <button onclick="filterByCategory('all')" style="padding:8px 15px; margin:5px; border:none; background:#333; color:#fff; border-radius:5px;">All</button>
-      <button onclick="filterByCategory('land')" style="padding:8px 15px; margin:5px; border:none; background:#2c3e50; color:#fff; border-radius:5px;">Land Buying</button>
-      <button onclick="filterByCategory('rental')" style="padding:8px 15px; margin:5px; border:none; background:#27ae60; color:#fff; border-radius:5px;">Rentals</button>
-      <button onclick="filterByCategory('investment')" style="padding:8px 15px; margin:5px; border:none; background:#d35400; color:#fff; border-radius:5px;">Investment</button>
-      <button onclick="filterByCategory('landlord')" style="padding:8px 15px; margin:5px; border:none; background:#8e44ad; color:#fff; border-radius:5px;">Landlords</button>
-      <button onclick="filterByCategory('news')" style="padding:8px 15px; margin:5px; border:none; background:#c0392b; color:#fff; border-radius:5px;">Market News</button>
-    </div>
+ <div style="margin-top:10px; text-align:center;">
+  <button onclick="filterByCategory('all')" style="padding:8px 15px; margin:5px; border:none; background:#333; color:#fff; border-radius:5px;">All</button>
+  
+  <button onclick="filterByCategory('buyer')" style="padding:8px 15px; margin:5px; border:none; background:#1abc9c; color:#fff; border-radius:5px;">Buyers</button>
+  
+  <button onclick="filterByCategory('rental')" style="padding:8px 15px; margin:5px; border:none; background:#27ae60; color:#fff; border-radius:5px;">Rentals</button>
+  
+  <button onclick="filterByCategory('tenant')" style="padding:8px 15px; margin:5px; border:none; background:#16a085; color:#fff; border-radius:5px;">Tenants</button>
+  
+  <button onclick="filterByCategory('landlord')" style="padding:8px 15px; margin:5px; border:none; background:#8e44ad; color:#fff; border-radius:5px;">Landlords</button>
+  
+  <button onclick="filterByCategory('investment')" style="padding:8px 15px; margin:5px; border:none; background:#d35400; color:#fff; border-radius:5px;">Investment</button>
+  
+ 
+</div>
+
+
+
   </section>
 
   <!-- Blog Content -->
@@ -62,7 +72,7 @@
 
   <!-- Footer -->
   <footer style="background:#333; color:#fff; text-align:center; padding:15px; margin-top:40px;">
-    <p>&copy; 2025 RealPlot Connect by Webs Star. All Rights Reserved.</p>
+    <p>&copy; 2025 RealPlot Connect. All Rights Reserved.</p>
   </footer>
 
 <script>
@@ -82,57 +92,366 @@
 
   // ✅ Blog posts
   const posts = [
+   
+   {
+  id: 1,
+  title: "Why RealPlot Marketplace Is Revolutionizing Real Estate in Kenya",
+  preview: "RealPlot Connect transforms how Kenyans discover, buy, and rent property. Explore live maps, verified listings, voice-guided directions, and agent tools — all in one platform.",
+  full: `
+    <h2>Why RealPlot Marketplace Is Revolutionizing Real Estate in Kenya</h2>
+    <p>The Kenyan property market is evolving fast. With digital technology reshaping how people find and manage property, <strong>RealPlot Connect</strong> stands out as a <strong>smart, map-based real estate marketplace</strong> that empowers <strong>buyers, tenants, agents, and landlords</strong> across Kenya.</p>
+
+    <h3>1. Discover Property Easily on the RealPlot Map</h3>
+    <p>Forget complicated listings — the <strong>RealPlot Customer Map</strong> lets you explore land, rentals, and homes <strong>visually</strong>. Simply open the map, zoom into your location, and tap on property markers to view details, prices, and directions.</p>
+    <ul>
+      <li>🗺️ Real-time map view of land and rentals near you</li>
+      <li>🏡 Filter by location, budget, or property type</li>
+      <li>📍 Voice-guided navigation directly to your chosen property</li>
+      <li>📸 Image previews and verified seller information</li>
+    </ul>
+
+    <h3>2. Verified Listings You Can Trust</h3>
+    <p>Every listing on <strong>RealPlot Marketplace</strong> is verified before publication. Sellers and agents go through a <strong>profile verification system</strong> that ensures authenticity, helping buyers and renters avoid fraud.</p>
+    <ul>
+      <li>✅ Verified agents and landlords</li>
+      <li>✅ Real-time property updates</li>
+      <li>✅ Report and review suspicious listings</li>
+    </ul>
+
+    <h3>3. Smart Property Tools for Agents & Landlords</h3>
+    <p>Agents and landlords can create, manage, and promote properties in seconds. RealPlot gives professionals tools that make real estate management simple and digital.</p>
+    <ul>
+      <li>🏢 Post unlimited listings with photos and descriptions</li>
+      <li>📍 Set property coordinates for accurate map visibility</li>
+      <li>📊 Track inquiries, views, and engagement statistics</li>
+      <li>💬 Chat with potential buyers or tenants instantly</li>
+      <li>🧭 Share direct voice-guided map links to clients</li>
+    </ul>
+
+    <h3>4. For Buyers & Renters – Find Property Without Agents</h3>
+    <p>RealPlot empowers ordinary users to <strong>find and verify property</strong> without relying entirely on brokers. Whether you’re searching for a plot in Kitengela or a bedsitter in Thika, you can browse listings yourself and contact owners directly.</p>
+    <ul>
+      <li>🏠 View property details, owner contact, and directions instantly</li>
+      <li>💰 Compare prices and sizes side by side</li>
+      <li>📞 Call or message property owners directly</li>
+    </ul>
+
+    <h3>5. RealPlot Connect for Real Estate Businesses</h3>
+    <p>For property developers and agencies, RealPlot offers <strong>dedicated business profiles</strong> with dashboards to manage listings, promote brand visibility, and connect with more clients across Kenya.</p>
+    <ul>
+      <li>🏗️ Agency dashboards with performance insights</li>
+      <li>📈 Visibility on the customer map and search results</li>
+      <li>🔗 Integrated WhatsApp and call buttons</li>
+      <li>🧾 Auto-generated digital business cards for agents</li>
+    </ul>
+
+    <h3>6. RealPlot Partner & Referral Program</h3>
+    <p>RealPlot rewards users who refer others to join the platform. Agents, landlords, and customers can earn a <strong>25% referral commission</strong> when a new user joins through their link.</p>
+    <ul>
+      <li>💵 Earn 10% for every successful referral(After buying or selling a property)</li>
+      <li>📲 Share your link directly via WhatsApp or SMS</li>
+      <li>🎯 Track referrals in your RealPlot dashboard</li>
+    </ul>
+
+    <h3>7. Why Choose RealPlot Marketplace?</h3>
+    <ul>
+      <li>✅ Verified property listings you can trust</li>
+      <li>✅ Live map with real-time locations</li>
+      <li>✅ Voice-guided directions to properties</li>
+      <li>✅ Tools for agents, landlords, and developers</li>
+      <li>✅ Direct contact between buyers and sellers</li>
+      <li>✅ 25% referral commission for every new user</li>
+      <li>✅ Built and hosted by Webs Star in Kenya 🇰🇪</li>
+    </ul>
+
+    <p><strong>RealPlot Connect is transforming how Kenya buys, sells, and manages land and property — bringing transparency, convenience, and technology into every deal.</strong></p>
+
+    <p>👉 Visit: <a href="https://webs-star.github.io/realestate.com/realplot" target="_blank">RealPlot portfolio</a><br>
+    📲 Get Started: <a href="https://webs-star.github.io/realestate.com/customers" target="_blank">RealPlot Connect properties</a></p>
+	📲 Get Started: <a href="https://webs-star.github.io/realestate.com/" target="_blank">RealPlot Conect landlords</a></p>
+  `,
+  category: "marketplace"
+},
+
+   
+   
+   
     {
-      id: 1,
-      title: "How to Verify Land Ownership in Kenya (2025 Guide)",
-      preview: "Before buying land, always verify ownership through official channels. Learn how to confirm title deeds, land registry details, and avoid property fraud in Kenya.",
-      full: `
-        <h2>How to Verify Land Ownership in Kenya (2025 Guide)</h2>
-        <p>Buying land in Kenya requires careful verification. Many unsuspecting buyers lose millions to land fraud due to skipped due diligence. Here’s a quick guide to safeguard your investment:</p>
-        <h3>1. Conduct an Official Land Search</h3>
-        <p>Visit the <strong>Ministry of Lands or use the eCitizen platform</strong> to conduct a land search. You’ll need the land title number and a copy of the seller’s ID.</p>
-        <h3>2. Confirm Seller Identity</h3>
-        <p>Cross-check the landowner’s ID and title deed details to ensure they match. Beware of brokers posing as owners.</p>
-        <h3>3. Visit the Land Physically</h3>
-        <p>Confirm boundaries and ensure no encroachment or disputes exist. Talk to neighbors and local leaders.</p>
-        <p>✅ Always consult a licensed surveyor and advocate before finalizing the deal.</p>
-      `,
-      category: "land"
-    },
-    {
-      id: 2,
-      title: "Top 5 Real Estate Investment Opportunities in Kenya (2025)",
-      preview: "From satellite towns to serviced apartments, here are Kenya’s top investment areas for 2025 and beyond.",
-      full: `
-        <h2>Top 5 Real Estate Investment Opportunities in Kenya (2025)</h2>
-        <p>Kenya’s property market continues to expand. As infrastructure projects grow, satellite towns are turning into goldmines for smart investors.</p>
-        <ul>
-          <li>🏘️ <strong>Ruiru and Juja</strong> – Affordable plots with rapid development.</li>
-          <li>🏗️ <strong>Athi River</strong> – Industrial and residential demand booming.</li>
-          <li>🏝️ <strong>Diani & Malindi</strong> – Perfect for vacation rentals and resorts.</li>
-          <li>🏢 <strong>Nairobi CBD</strong> – Office-to-residential conversions are trending.</li>
-          <li>🏠 <strong>Kitengela & Ngong</strong> – Popular with middle-class home buyers.</li>
-        </ul>
-        <p>💡 Tip: Always consider infrastructure, zoning laws, and rental demand before investing.</p>
-      `,
-      category: "investment"
-    },
-    {
-      id: 3,
-      title: "How to Manage Rental Property Efficiently as a Landlord",
-      preview: "Managing rentals can be challenging. Learn tips on collecting rent, handling tenants, and maintaining your property easily.",
-      full: `
-        <h2>How to Manage Rental Property Efficiently as a Landlord</h2>
-        <p>Being a landlord in Kenya comes with responsibility. From rent collection to maintenance, good management ensures long-term success.</p>
-        <h3>1. Use Digital Payment Systems</h3>
-        <p>Platforms like <strong>RealPlot Connect</strong> let tenants pay rent online and track receipts automatically.</p>
-        <h3>2. Keep Transparent Records</h3>
-        <p>Maintain a digital log for all payments, maintenance requests, and agreements to avoid disputes.</p>
-        <h3>3. Regular Property Inspections</h3>
-        <p>Schedule quarterly visits to check property conditions and plan repairs before they escalate.</p>
-      `,
-      category: "landlord"
-    }
+  id: 2,
+  title: "Top 5 Real Estate Investment Opportunities in Kenya (2025)",
+  preview: "From satellite towns to serviced apartments, here are Kenya’s top investment areas for 2025 and beyond — and how RealPlot Connect helps you find them faster.",
+  full: `
+    <h2>Top 5 Real Estate Investment Opportunities in Kenya (2025)</h2>
+    <p>Kenya’s real estate market is one of Africa’s fastest-growing sectors. With new highways, industrial parks, and housing projects, <strong>landowners and investors</strong> are seeing new opportunities in every direction.</p>
+
+    <p><strong>RealPlot Connect</strong> lets you explore, list, and locate these properties instantly on a live interactive map — complete with <strong>voice-guided navigation</strong> and smart filters for <strong>price, location, and property type</strong>. Whether you’re buying, leasing, or developing, here’s where the real value lies this year:</p>
+
+    <h3>1. 🏘️ Ruiru and Juja – Fast-Growing Satellite Towns</h3>
+    <p>Affordable plots, good roads, and proximity to Nairobi make <strong>Ruiru and Juja</strong> some of Kenya’s most promising investment zones. Land prices here are rising fast — and listings on RealPlot Connect show active development in every corner.</p>
+
+    <h3>2. 🏗️ Athi River – The Industrial & Residential Powerhouse</h3>
+    <p>With improved connectivity via the expressway, <strong>Athi River</strong> continues to attract both residential and industrial investors. Use RealPlot Connect to filter through <strong>industrial land, rental units, and gated communities</strong> by location or budget.</p>
+
+    <h3>3. 🏝️ Diani & Malindi – Coastal Goldmines for Holiday Homes</h3>
+    <p>If you’re looking for passive income, vacation rentals in <strong>Diani</strong> and <strong>Malindi</strong> are booming. Coastal listings on RealPlot Connect include beachfront plots and furnished villas perfect for Airbnb or resort development.</p>
+
+    <h3>4. 🏢 Nairobi CBD – Office-to-Residential Conversions</h3>
+    <p>Downtown Nairobi is transforming. Many landlords are converting old office buildings into <strong>studio apartments and co-living spaces</strong>. You can list or scout such opportunities directly on RealPlot Connect’s dynamic map view.</p>
+
+    <h3>5. 🏠 Kitengela & Ngong – Homes for the Growing Middle Class</h3>
+    <p>With affordable land and modern amenities, <strong>Kitengela</strong> and <strong>Ngong</strong> continue to attract middle-income families. RealPlot Connect gives landlords direct access to verified buyers and tenants — all in one place.</p>
+
+    <h3>💡 Investment Tip</h3>
+    <p>Before purchasing, always check <strong>infrastructure plans, zoning laws, title status,</strong> and <strong>rental potential</strong>. RealPlot Connect provides verified listings and an interactive map that helps you analyze nearby roads, schools, and amenities before committing.</p>
+
+    <h3>Why Use RealPlot Connect?</h3>
+    <ul>
+      <li>🗺️ <strong>Interactive Live Map</strong> – See real properties plotted across Kenya.</li>
+      <li>📢 <strong>Landlord Portal</strong> – List plots, rentals, and properties with photos & details.</li>
+      <li>🔊 <strong>Voice-Guided Directions</strong> – Navigate easily to your property of interest.</li>
+      <li>🏡 <strong>Verified Listings</strong> – Get genuine data from property owners, not brokers.</li>
+      <li>💰 <strong>Smart Filters</strong> – Sort by price, size, location, or type in seconds.</li>
+      <li>🧭 <strong>Location Intelligence</strong> – Instantly view nearby roads and developments.</li>
+      <li>📲 <strong>Responsive Design</strong> – Access from your phone, tablet, or computer.</li>
+    </ul>
+
+    <h3>For Landlords and Real Owners</h3>
+    <p>If you own property, RealPlot Connect gives you a dedicated portal to <strong>list, update, and track</strong> your plots or rentals — ensuring your listings reach verified buyers and tenants fast.</p>
+
+    <p><strong>Get started now:</strong></p>
+    <ul>
+     
+	 
+    <p>👉 Visit: <a href="https://webs-star.github.io/realestate.com/realplot" target="_blank">RealPlot portfolio</a><br>
+    📲 Get Started: <a href="https://webs-star.github.io/realestate.com/customers" target="_blank">RealPlot Connect properties</a></p>
+	📲 Get Started: <a href="https://webs-star.github.io/realestate.com/" target="_blank">RealPlot Conect landlords</a></p>
+	 
+  `,
+  category: "investment"
+},
+
+	
+	
+	
+	{
+  id: 3,
+  title: "How to Manage Rental Property Wisely as a Landlord in Kenya",
+  preview: "Learn how to handle tenants, maintain your property, and build lasting trust as a landlord in Kenya with guidance from RealPlot Connect.",
+  full: `
+    <h2>How to Manage Rental Property Wisely as a Landlord in Kenya</h2>
+    <p>Being a landlord in Kenya requires more than collecting rent — it’s about <strong>good communication, fair management, and proper property care</strong>. At <strong>RealPlot Connect</strong>, we help landlords understand how to deal better with tenants, keep their houses in good condition, and create peaceful living environments for everyone.</p>
+
+    <h3>🏠 1. Keep Open and Respectful Communication</h3>
+    <p>Tenants appreciate honesty and respect. Always communicate clearly about rent terms, repairs, and any house rules. 
+    Avoid emotional reactions — listen to your tenants and respond calmly. 
+    <strong>RealPlot Connect</strong> encourages landlords to treat tenants as partners in maintaining the property.</p>
+
+    <h3>🧾 2. Keep Proper Records</h3>
+    <p>Every landlord should keep written or digital records of tenancy agreements, payment confirmations, and maintenance work. 
+    This prevents misunderstandings and builds trust. Having all documents organized helps you handle disputes quickly and fairly.</p>
+
+    <h3>🔧 3. Maintain Your Property Regularly</h3>
+    <p>Inspect your rentals or plots regularly. Fix small problems like leaking taps or broken doors early before they become expensive. 
+    A well-maintained property attracts good tenants and helps you preserve its value for years. 
+    <strong>RealPlot Connect</strong> encourages preventive maintenance instead of waiting for things to break down.</p>
+
+    <h3>💬 4. Understand Your Tenants’ Needs</h3>
+    <p>Every tenant is different. Some may be students, others families or workers. 
+    Understanding their lifestyle helps you manage them better. For example, families appreciate clean water and safe compounds, while students prefer Wi-Fi and affordable rooms.</p>
+
+    <h3>⚖️ 5. Be Fair and Transparent</h3>
+    <p>Good landlords are fair in everything — from setting rent to resolving conflicts. 
+    Avoid discrimination or favoritism. 
+    <strong>RealPlot Connect</strong> teaches that fairness builds loyalty and long-term occupancy, reducing frequent tenant turnover.</p>
+
+    <h3>🧰 6. Follow Legal Requirements</h3>
+    <p>Know the tenancy laws in Kenya. 
+    Every landlord should understand their rights and responsibilities — including eviction procedures, notice periods, and tenant protection rules. 
+    Staying informed keeps you safe from legal trouble.</p>
+
+    <h3>📍 7. Use Technology to Stay Informed</h3>
+    <p>Even though RealPlot Connect doesn’t handle payments, it helps landlords <strong>stay updated on modern property management practices</strong>. 
+    You can view property listings, explore nearby plots, and learn how to attract tenants through smart listing techniques.</p>
+
+    <h3>🌿 8. Build a Good Relationship with Neighbours</h3>
+    <p>Tenants who live peacefully with neighbours stay longer. Encourage cleanliness, respect for shared spaces, and proper garbage disposal. 
+    A peaceful environment attracts more tenants and improves your reputation as a landlord.</p>
+
+    <h3>💡 9. Get Expert Advice Before Major Decisions</h3>
+    <p>Before selling land, increasing rent, or building new units, seek advice. 
+    <strong>RealPlot Connect</strong> connects you with guides on what to check — from land searches, zoning, and location safety to tenant demand in your area.</p>
+
+    <h3>🌍 Why Landlords in Kenya Trust RealPlot Connect</h3>
+    <ul>
+      <li>✅ Expert advice for landlords and tenants</li>
+      <li>✅ Tips on maintaining property and managing tenants</li>
+      <li>✅ Guides on safe property buying and land search steps</li>
+      <li>✅ Community-driven approach for better living and renting</li>
+      <li>✅ Verified information tailored to Kenyan landlords</li>
+    </ul>
+
+  
+    <p>👉 Visit: <a href="https://webs-star.github.io/realestate.com/realplot" target="_blank">RealPlot portfolio</a><br>
+    📲 Get Started: <a href="https://webs-star.github.io/realestate.com/customers" target="_blank">RealPlot Connect properties</a></p>
+	📲 Get Started: <a href="https://webs-star.github.io/realestate.com/" target="_blank">RealPlot Conect landlords</a></p>
+  `,
+  category: "landlord"
+},
+
+
+
+{
+  id: 4,
+  title: "How to Be a Responsible Tenant in Kenya",
+  preview: "Learn how to live peacefully, care for your rental, and maintain good relations with your landlord. RealPlot Connect guides tenants in Kenya toward better renting habits.",
+  full: `
+    <h2>How to Be a Responsible Tenant in Kenya</h2>
+    <p>Renting a house or apartment in Kenya is more than just paying monthly rent — it’s about <strong>living responsibly, maintaining your space, and building trust with your landlord</strong>. 
+    <strong>RealPlot Connect</strong> helps tenants understand their roles and rights to create peaceful, long-term relationships with property owners.</p>
+
+    <h3>🏠 1. Read and Understand the Tenancy Agreement</h3>
+    <p>Before moving in, make sure you read and understand your tenancy contract. 
+    It explains your rent amount, notice period, and responsibilities. 
+    Never sign anything you don’t understand — and always ask questions if something seems unclear.</p>
+
+    <h3>🧾 2. Keep Rent Agreements and Receipts Safe</h3>
+    <p>Always request a written rent receipt or confirmation from your landlord. 
+    Keep them safely — they protect you in case of any disagreement later. 
+    <strong>RealPlot Connect</strong> encourages tenants to stay organized with their rental documents.</p>
+
+    <h3>🧹 3. Maintain Cleanliness and Respect the Property</h3>
+    <p>Take good care of the house or room you occupy. 
+    Avoid damaging walls, doors, or plumbing. 
+    Simple acts like cleaning, proper garbage disposal, and turning off taps and lights help keep the property in good condition.</p>
+
+    <h3>💬 4. Communicate Respectfully with Your Landlord</h3>
+    <p>Good communication solves problems faster. 
+    Inform your landlord early if you’ll delay rent or need repairs. 
+    Avoid shouting or confrontation — polite discussion keeps the relationship healthy. 
+    <strong>RealPlot Connect</strong> promotes mutual respect between tenants and landlords in Kenya.</p>
+
+    <h3>🔧 5. Report Repairs and Issues Early</h3>
+    <p>Don’t ignore leaking taps, faulty sockets, or broken windows. 
+    Inform your landlord as soon as possible. 
+    Early reporting prevents bigger damage and saves both you and your landlord time and money.</p>
+
+    <h3>⚖️ 6. Know Your Rights and Responsibilities</h3>
+    <p>Every tenant in Kenya has rights — and responsibilities too. 
+    You have the right to a safe home and fair treatment, but also the duty to care for the property and follow agreed rules. 
+    <strong>RealPlot Connect</strong> helps tenants understand tenancy laws to avoid conflicts.</p>
+
+    <h3>📅 7. Give Proper Notice Before Moving Out</h3>
+    <p>When you plan to move, always give your landlord the agreed notice (usually one month). 
+    This gives them time to prepare for the next tenant and prevents deposit disputes.</p>
+
+    <h3>🌿 8. Live Peacefully with Neighbours</h3>
+    <p>Respect shared spaces and maintain peace in the compound. 
+    Avoid loud music, late-night noise, or conflicts. 
+    A peaceful environment benefits everyone and improves your reputation as a good tenant.</p>
+
+    <h3>💡 9. Learn and Grow Through RealPlot Connect</h3>
+    <p>Even though RealPlot Connect doesn’t handle rent payments, it offers useful guides for tenants — from finding verified rentals and plots to learning how to live well under different landlords.</p>
+
+    <h3>🌍 Why Tenants in Kenya Love RealPlot Connect</h3>
+    <ul>
+      <li>✅ Tips on living peacefully in rental properties</li>
+      <li>✅ Advice on understanding rental agreements</li>
+      <li>✅ Guides on how to handle repairs and communication</li>
+      <li>✅ Verified listings for safe property discovery</li>
+      <li>✅ Local insights made for Kenyan renters</li>
+    </ul>
+
+    <p><strong>RealPlot Connect</strong> believes that happy tenants make happy landlords. 
+    By living responsibly and communicating well, you create a better home for yourself and others.</p>
+
+    <p>👉 Visit: <a href="https://webs-star.github.io/realestate.com/realplot" target="_blank">RealPlot portfolio</a><br>
+    📲 Get Started: <a href="https://webs-star.github.io/realestate.com/customers" target="_blank">RealPlot Connect properties</a></p>
+	📲 Get Started: <a href="https://webs-star.github.io/realestate.com/" target="_blank">RealPlot Conect landlords</a></p>
+  `,
+  category: "tenant"
+},
+
+
+{
+  id: 5,
+  title: "Steps to Follow Before Buying Land or Property in Kenya",
+  preview: "Thinking of buying land or a house in Kenya? Learn every essential step — from land search, title verification, to final registration — before you commit.",
+  full: `
+    <h2>Steps to Follow Before Buying Land or Property in Kenya</h2>
+    <p>Buying land or property is one of the most important investments you can make. Unfortunately, many Kenyans lose money because they skip vital steps in the process. 
+    <strong>RealPlot Connect</strong> guides buyers through each stage — helping you make smart, legal, and safe decisions before purchasing any property.</p>
+
+    <h3>📍 1. Identify a Genuine Property</h3>
+    <p>Start by confirming that the property or plot actually exists and is available for sale. Visit the site physically to confirm beacons, location, and boundaries. 
+    <strong>RealPlot Connect</strong> lists verified plots and properties with real photos, maps, and seller details to reduce fraud risk.</p>
+
+    <h3>📜 2. Conduct an Official Land Search</h3>
+    <p>Before paying anything, perform an official land search at the <strong>Ministry of Lands</strong>.  
+    This confirms the rightful owner, title number, and any encumbrances (like loans or disputes) attached to the land.</p>
+
+    <h3>🧾 3. Verify the Title Deed</h3>
+    <p>Check that the title deed is genuine and matches the name of the seller. 
+    Cross-check details like parcel number, size, and county. 
+    Avoid copies — always inspect the original title and ensure the seller presents valid identification.</p>
+
+    <h3>📐 4. Engage a Licensed Surveyor</h3>
+    <p>Hire a government-approved surveyor to confirm the land boundaries. 
+    The surveyor will verify beacon placement and ensure the land size matches the title deed. 
+    This helps prevent future boundary disputes with neighbours.</p>
+
+    <h3>⚖️ 5. Get a Lawyer to Review the Sale Agreement</h3>
+    <p>Never sign a sale agreement without legal advice. 
+    A property lawyer ensures that all terms are clear, fair, and binding. 
+    The agreement should include payment timelines, deposit terms, transfer clauses, and penalties for breach.</p>
+
+    <h3>💰 6. Pay Through Safe and Traceable Methods</h3>
+    <p>Always use traceable payment channels like bank transfers or lawyers’ escrow accounts — not cash. 
+    Keep all receipts and transaction records. 
+    <strong>RealPlot Connect</strong> does not handle payments but provides guidance on safe property transactions.</p>
+
+    <h3>📑 7. Obtain Land Control Board (LCB) Consent</h3>
+    <p>For agricultural land, you must get LCB consent before the transfer. 
+    This approval ensures the sale is legitimate and prevents illegal land dealings.</p>
+
+    <h3>🧭 8. Complete the Transfer and Registration</h3>
+    <p>Once all documents are signed, submit them to the Lands Registry for official transfer. 
+    The buyer’s name is entered in the land register, and a new title deed is issued — confirming full ownership.</p>
+
+    <h3>🏗️ 9. Verify Physical Possession</h3>
+    <p>After registration, take physical possession of the land or property immediately. 
+    Fence your land, mark boundaries, and install a caretaker if needed. 
+    This prevents encroachment or illegal occupation.</p>
+
+    <h3>🌍 10. Use RealPlot Connect to Stay Informed</h3>
+    <p><strong>RealPlot Connect</strong> helps buyers stay informed about <strong>verified plots, property listings, and land-buying procedures in Kenya</strong>. 
+    From land search guidance to ownership transfer tips, you’ll find step-by-step support to make your investment journey safer.</p>
+
+    <h3>🧠 Smart Buyer Tips from RealPlot Connect</h3>
+    <ul>
+      <li>✅ Never rush to buy land without verification</li>
+      <li>✅ Always involve a licensed lawyer and surveyor</li>
+      <li>✅ Keep all documents and receipts safely</li>
+      <li>✅ Avoid cash payments or verbal agreements</li>
+      <li>✅ Confirm zoning, accessibility, and amenities nearby</li>
+    </ul>
+
+    <p><strong>Buying land the right way protects your investment and peace of mind.</strong> 
+    Whether it’s a residential plot, commercial property, or farmland, follow these steps and stay guided with <strong>RealPlot Connect</strong>.</p>
+
+    <p>👉 Visit: <a href="https://webs-star.github.io/realestate.com/realplot" target="_blank">RealPlot portfolio</a><br>
+    📲 Get Started: <a href="https://webs-star.github.io/realestate.com/customers" target="_blank">RealPlot Connect properties</a></p>
+	📲 Get Started: <a href="https://webs-star.github.io/realestate.com/" target="_blank">RealPlot Conect landlords</a></p>
+  `,
+  category: "buyer"
+}
+
+
+
+	
+	
+	
+	
+	
   ];
 
   const postList = document.getElementById("post-list");
