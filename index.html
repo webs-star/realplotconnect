@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="U5XTc52kcwPqUunl-p9uagUoK3-O9wwGZhr7G1fL2bo" />
+
+  <title>RealPlot Blog – Real Estate Tips, Land Insights & Market Trends in Kenya</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="RealPlot Blog: Explore property market insights, real estate investment tips, and land trends in Kenya. Learn how to buy, sell, or manage plots, rentals, and commercial property smartly." />
+  <meta name="keywords" content="RealPlot Blog, real estate Kenya, land buying Kenya, property investment tips, landlord resources, rental management Kenya, plots and houses, property news, realplot connect" />
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="RealPlot Connect by Webs Star">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="RealPlot Blog – Property Market Trends & Land Insights in Kenya">
+  <meta property="og:description" content="Stay updated with land buying guides, property investment ideas, and real estate news in Kenya. Explore RealPlot Blog for smart property decisions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://webs-star.github.io/realestate.com/blog">
+  <meta property="og:image" content="https://webs-star.github.io/realestate.com/assets/realplot-blog-preview.jpg">
+
+  <!-- Canonical Link -->
+  <link rel="canonical" href="https://webs-star.github.io/realestate.com/blog">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://webs-star.github.io/realestate.com/favicon.ico" type="image/x-icon">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body style="font-family: Arial, sans-serif; background:#f9f9f9; margin:0; padding:0;">
+
+  <!-- Header -->
+  <header style="background:#2c3e50; color:#fff; padding:20px; text-align:center;">
+    <img src="https://cdn-icons-png.flaticon.com/512/235/235861.png" alt="RealPlot Logo" style="width:80px; height:auto; margin-bottom:10px;">
+    <h1 style="margin:0; font-size:28px;">RealPlot Connect – Real Estate Blog</h1>
+    <p style="margin:5px 0 0; font-size:16px;">Smart Property • Smart Investment • Smart Future</p>
+  </header>
+
+  <!-- Search & Filters -->
+  <section style="max-width:900px; margin:20px auto; padding:10px; text-align:center;">
+    <input id="searchBox" type="text" placeholder="🔍 Search property topics..." 
+      style="width:60%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+
+    <div style="margin-top:10px; text-align:center;">
+      <button onclick="filterByCategory('all')" style="padding:8px 15px; margin:5px; border:none; background:#333; color:#fff; border-radius:5px;">All</button>
+      <button onclick="filterByCategory('land')" style="padding:8px 15px; margin:5px; border:none; background:#2c3e50; color:#fff; border-radius:5px;">Land Buying</button>
+      <button onclick="filterByCategory('rental')" style="padding:8px 15px; margin:5px; border:none; background:#27ae60; color:#fff; border-radius:5px;">Rentals</button>
+      <button onclick="filterByCategory('investment')" style="padding:8px 15px; margin:5px; border:none; background:#d35400; color:#fff; border-radius:5px;">Investment</button>
+      <button onclick="filterByCategory('landlord')" style="padding:8px 15px; margin:5px; border:none; background:#8e44ad; color:#fff; border-radius:5px;">Landlords</button>
+      <button onclick="filterByCategory('news')" style="padding:8px 15px; margin:5px; border:none; background:#c0392b; color:#fff; border-radius:5px;">Market News</button>
+    </div>
+  </section>
+
+  <!-- Blog Content -->
+  <main id="blog-content" style="max-width:900px; margin:30px auto; padding:20px;">
+    <div id="post-list"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background:#333; color:#fff; text-align:center; padding:15px; margin-top:40px;">
+    <p>&copy; 2025 RealPlot Connect by Webs Star. All Rights Reserved.</p>
+  </footer>
+
+<script>
+  // ✅ Firebase config (replace with your own)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYztz7z8L3SFOZgCpbwthzTXeuhojDisM",
+    authDomain: "lead-tracker-a2181.firebaseapp.com",
+    databaseURL: "https://lead-tracker-a2181-default-rtdb.firebaseio.com",
+    projectId: "lead-tracker-a2181",
+    storageBucket: "lead-tracker-a2181.firebasestorage.app",
+    messagingSenderId: "601818438359",
+    appId: "1:601818438359:web:44f4c05db3d732d29dee92"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // ✅ Blog posts
+  const posts = [
+    {
+      id: 1,
+      title: "How to Verify Land Ownership in Kenya (2025 Guide)",
+      preview: "Before buying land, always verify ownership through official channels. Learn how to confirm title deeds, land registry details, and avoid property fraud in Kenya.",
+      full: `
+        <h2>How to Verify Land Ownership in Kenya (2025 Guide)</h2>
+        <p>Buying land in Kenya requires careful verification. Many unsuspecting buyers lose millions to land fraud due to skipped due diligence. Here’s a quick guide to safeguard your investment:</p>
+        <h3>1. Conduct an Official Land Search</h3>
+        <p>Visit the <strong>Ministry of Lands or use the eCitizen platform</strong> to conduct a land search. You’ll need the land title number and a copy of the seller’s ID.</p>
+        <h3>2. Confirm Seller Identity</h3>
+        <p>Cross-check the landowner’s ID and title deed details to ensure they match. Beware of brokers posing as owners.</p>
+        <h3>3. Visit the Land Physically</h3>
+        <p>Confirm boundaries and ensure no encroachment or disputes exist. Talk to neighbors and local leaders.</p>
+        <p>✅ Always consult a licensed surveyor and advocate before finalizing the deal.</p>
+      `,
+      category: "land"
+    },
+    {
+      id: 2,
+      title: "Top 5 Real Estate Investment Opportunities in Kenya (2025)",
+      preview: "From satellite towns to serviced apartments, here are Kenya’s top investment areas for 2025 and beyond.",
+      full: `
+        <h2>Top 5 Real Estate Investment Opportunities in Kenya (2025)</h2>
+        <p>Kenya’s property market continues to expand. As infrastructure projects grow, satellite towns are turning into goldmines for smart investors.</p>
+        <ul>
+          <li>🏘️ <strong>Ruiru and Juja</strong> – Affordable plots with rapid development.</li>
+          <li>🏗️ <strong>Athi River</strong> – Industrial and residential demand booming.</li>
+          <li>🏝️ <strong>Diani & Malindi</strong> – Perfect for vacation rentals and resorts.</li>
+          <li>🏢 <strong>Nairobi CBD</strong> – Office-to-residential conversions are trending.</li>
+          <li>🏠 <strong>Kitengela & Ngong</strong> – Popular with middle-class home buyers.</li>
+        </ul>
+        <p>💡 Tip: Always consider infrastructure, zoning laws, and rental demand before investing.</p>
+      `,
+      category: "investment"
+    },
+    {
+      id: 3,
+      title: "How to Manage Rental Property Efficiently as a Landlord",
+      preview: "Managing rentals can be challenging. Learn tips on collecting rent, handling tenants, and maintaining your property easily.",
+      full: `
+        <h2>How to Manage Rental Property Efficiently as a Landlord</h2>
+        <p>Being a landlord in Kenya comes with responsibility. From rent collection to maintenance, good management ensures long-term success.</p>
+        <h3>1. Use Digital Payment Systems</h3>
+        <p>Platforms like <strong>RealPlot Connect</strong> let tenants pay rent online and track receipts automatically.</p>
+        <h3>2. Keep Transparent Records</h3>
+        <p>Maintain a digital log for all payments, maintenance requests, and agreements to avoid disputes.</p>
+        <h3>3. Regular Property Inspections</h3>
+        <p>Schedule quarterly visits to check property conditions and plan repairs before they escalate.</p>
+      `,
+      category: "landlord"
+    }
+  ];
+
+  const postList = document.getElementById("post-list");
+
+  // ✅ Render blog previews
+  function renderPosts(filterCategory = "all", searchText = "") {
+    postList.innerHTML = "";
+    let filtered = posts;
+
+    if (filterCategory !== "all") filtered = filtered.filter(p => p.category === filterCategory);
+    if (searchText.trim() !== "")
+      filtered = filtered.filter(p =>
+        p.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        p.preview.toLowerCase().includes(searchText.toLowerCase())
+      );
+
+    if (filtered.length === 0) {
+      postList.innerHTML = `<p style="text-align:center; color:#888;">No articles found.</p>`;
+    } else {
+      filtered.forEach(post => {
+        const article = document.createElement("article");
+        article.style.cssText = "background:#fff; padding:20px; margin:20px 0; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);";
+        article.innerHTML = `
+          <h3 style="color:#2c3e50;">${post.title}</h3>
+          <p style="color:#555;">${post.preview}</p>
+          <span style="display:inline-block; margin-bottom:10px; padding:5px 10px; background:#eee; border-radius:5px; font-size:12px; color:#333;">${post.category}</span><br>
+          <button onclick="openFullPost(${post.id})" style="margin-top:10px; padding:8px 15px; border:none; background:#2c3e50; color:#fff; border-radius:5px; cursor:pointer;">Read More →</button>
+        `;
+        postList.appendChild(article);
+      });
+    }
+  }
+
+  // ✅ Open full post view
+  function openFullPost(id) {
+    const post = posts.find(p => p.id === id);
+    if (post) {
+      postList.innerHTML = `
+        <article id="full-post" style="background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="color:#2c3e50;">${post.title}</h2>
+          <p style="color:#888; font-size:14px;">Published on ${new Date().toDateString()}</p>
+          ${post.full}
+          <p style="margin-top:30px;">
+            <button onclick="renderPosts()" style="padding:8px 15px; border:none; background:#333; color:#fff; border-radius:5px;">← Back to Blog</button>
+          </p>
+        </article>
+        <div id="comments-section" style="margin-top:40px;">
+          <h3>💬 Comments</h3>
+          <div id="comment-list" style="margin-bottom:20px;"></div>
+          <textarea id="comment-input" placeholder="Write a comment..." style="width:100%; height:80px; padding:10px;"></textarea><br>
+          <button onclick="addComment(${post.id})" style="margin-top:10px; padding:8px 15px; background:#2c3e50; color:white; border:none; border-radius:5px;">Post Comment</button>
+        </div>
+      `;
+      loadComments(post.id);
+      document.getElementById("full-post").scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  // ✅ Filter and search
+  function filterByCategory(cat) {
+    renderPosts(cat, document.getElementById("searchBox").value);
+  }
+  document.getElementById("searchBox").addEventListener("input", function() {
+    renderPosts("all", this.value);
+  });
+
+  // ✅ Comments system
+  function loadComments(postId) {
+    const commentsRef = db.ref("comments/" + postId);
+    commentsRef.on("value", snapshot => {
+      const list = document.getElementById("comment-list");
+      list.innerHTML = "";
+      if (!snapshot.exists()) {
+        list.innerHTML = `<p style="color:#888;">No comments yet. Be the first!</p>`;
+        return;
+      }
+      snapshot.forEach(child => {
+        const comment = child.val();
+        const key = child.key;
+        const div = document.createElement("div");
+        div.style.cssText = "background:#fff; border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;";
+        div.innerHTML = `<p><strong>${comment.author || "Anonymous"}:</strong> ${comment.text}</p>`;
+        list.appendChild(div);
+      });
+    });
+  }
+
+  function addComment(postId) {
+    const input = document.getElementById("comment-input");
+    const text = input.value.trim();
+    if (text !== "") {
+      const newCommentRef = db.ref("comments/" + postId).push();
+      newCommentRef.set({
+        text: text,
+        author: "User",
+        timestamp: Date.now()
+      }).then(() => {
+        input.value = "";
+        const status = document.createElement("p");
+        status.style.color = "green";
+        status.innerText = "✅ Posted successfully!";
+        input.parentNode.insertBefore(status, input.nextSibling);
+        setTimeout(() => status.remove(), 2000);
+      });
+    }
+  }
+
+  // Initial render
+  renderPosts();
+</script>
+
+</body>
+</html>
