@@ -368,105 +368,173 @@ listingsDiv.appendChild(card);
 }
 
 
+function showMapForListing(destLat, destLng, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
 
-  function showMapForListing(destLat, destLng, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
+    const mapDiv = document.createElement("div");
+    mapDiv.style.height = "300px";
+    mapDiv.style.marginTop = "10px";
+    mapDiv.style.borderRadius = "10px";
+    container.appendChild(mapDiv);
 
-  const mapDiv = document.createElement("div");
-  mapDiv.style.height = "300px";
-  mapDiv.style.marginTop = "10px";
-  mapDiv.style.borderRadius = "10px";
-  container.appendChild(mapDiv);
+    const directionsList = document.createElement("div");
+    directionsList.className = "directions-text";
+    directionsList.style.marginTop = "10px";
+    directionsList.style.padding = "10px";
+    directionsList.style.background = "#f9f9f9";
+    directionsList.style.borderRadius = "8px";
+    // ⭐ Initial message changed to show the long wait time
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Acquiring location... (This may take up to 20 seconds on mobile data)</em>";
+    container.appendChild(directionsList);
 
-  const directionsList = document.createElement("div");
-  directionsList.className = "directions-text";
-  directionsList.style.marginTop = "10px";
-  directionsList.style.padding = "10px";
-  directionsList.style.background = "#f9f9f9";
-  directionsList.style.borderRadius = "8px";
-  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
-  container.appendChild(directionsList);
+    const destinationLatLng = L.latLng(destLat, destLng);
+    
+    let map = null;
+    let userMarker = null;
+    let routeControl = null;
+    let straightLine = null;
+    
+    // --- STEP 1: Define the Routing Logic ---
 
-  const map = L.map(mapDiv).setView([destLat, destLng], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    function createRoute(userLatLng) {
+        // Cleanup previous layers
+        if (routeControl) { map.removeControl(routeControl); routeControl = null; }
+        if (straightLine) { map.removeLayer(straightLine); straightLine = null; }
 
-  const destinationLatLng = L.latLng(destLat, destLng);
-  L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
+        directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating best road route...</em>";
 
-  let userMarker = null;
-  let routeControl = null;
+        // Create the road routing control
+        routeControl = L.Routing.control({
+            waypoints: [userLatLng, destinationLatLng],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            createMarker: () => null,
+            show: false,
+            lineOptions: {
+                styles: [{ color: 'blue', weight: 4, opacity: 0.8 }]
+            }
+        }).addTo(map);
 
-  function updateRoute(userLatLng) {
-    if (userMarker) {
-      userMarker.setLatLng(userLatLng);
-    } else {
-      userMarker = L.marker(userLatLng, {
-        icon: L.icon({
-          iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-          iconSize: [25, 25],
-          iconAnchor: [12, 12]
-        })
-      }).addTo(map).bindPopup("You are here");
+        // --- Routing Error Handler (The critical fallback) ---
+        routeControl.on('routingerror', function (e) {
+            console.error("Road Routing Error:", e.error);
+            
+            // Immediately trigger straight-line fallback on failure
+            straightLineFallback(userLatLng);
+        });
+
+        // --- Routing Success Handler ---
+        routeControl.on('routesfound', function (e) {
+            const route = e.routes[0];
+            const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+            const timeMin = (route.summary.totalTime / 60).toFixed(0);
+
+            let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
+            const instructions = route.instructions || [];
+
+            const formatter = new L.Routing.Formatter();
+            if (instructions.length === 0 && route.instructions === undefined) {
+                route.instructions = formatter._getInstructions.call({options:{}}, route);
+            }
+
+            for (const step of route.instructions || []) {
+                if (step.text) {
+                    steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+                }
+            }
+
+            steps += `<br><em>Total Distance:</em> **${distanceKm} km**<br>`;
+            steps += `<em>Estimated Time:</em> **${timeMin} mins**`;
+
+            directionsList.innerHTML = steps;
+        });
     }
 
-    if (routeControl) {
-      map.removeControl(routeControl);
+    function straightLineFallback(userLatLng) {
+        // Fallback cleanup (in case an error occurred mid-route draw)
+        if (routeControl) { map.removeControl(routeControl); routeControl = null; }
+        
+        const distanceToDestination = userLatLng.distanceTo(destinationLatLng);
+        
+        // Draw the straight line
+        straightLine = L.polyline([userLatLng, destinationLatLng], {
+            color: 'red', 
+            weight: 3, 
+            dashArray: '10, 10', 
+            opacity: 0.8
+        }).addTo(map);
+
+        directionsList.innerHTML = `
+            ❌ <strong>Road Route Failed!</strong><br>
+            Showing **Straight Line Distance:** **${(distanceToDestination / 1000).toFixed(2)} km** (${distanceToDestination.toFixed(0)}m)<br>
+            <em>This often happens due to a poor 3G/4G signal. You must navigate the rest of the way manually.</em>
+        `;
     }
 
-    routeControl = L.Routing.control({
-      waypoints: [userLatLng, destinationLatLng],
-      routeWhileDragging: false,
-      addWaypoints: false,
-      createMarker: () => null,
-      show: false,
-      lineOptions: {
-        styles: [{ color: 'blue', weight: 4, opacity: 0.8 }]
-      }
-    }).addTo(map);
+    // --- STEP 2: Acquire Location (Using Single, Robust Request) ---
 
-    routeControl.on('routesfound', function (e) {
-      const route = e.routes[0];
-      const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-      const timeMin = (route.summary.totalTime / 60).toFixed(0);
+    // We use getCurrentPosition instead of watchPosition for one stable fix.
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+            const accuracyMeters = pos.coords.accuracy;
 
-      let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
-      const instructions = route.instructions || [];
+            // 1. Initialize the map now that we have a location
+            map = L.map(mapDiv).setView(userLatLng, 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      // Leaflet sometimes leaves instructions empty, fix it manually
-      const formatter = new L.Routing.Formatter();
-      if (instructions.length === 0 && route.instructions === undefined) {
-        const legs = route.instructions = formatter._getInstructions.call({options:{}}, route);
-      }
+            L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
 
-      for (const step of instructions) {
-        if (step.text) {
-          steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+            // 2. Add User Marker
+            userMarker = L.marker(userLatLng, {
+                icon: L.icon({
+                    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+                    iconSize: [25, 25],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup(`You are here (Accuracy: ${accuracyMeters.toFixed(0)}m)`);
+            
+            // 3. Immediately attempt road routing
+            createRoute(userLatLng);
+
+            // 4. Implement a simple watching logic for updates (optional but helpful)
+            // This re-attempts the route every 30 seconds if successful
+            setInterval(() => {
+                navigator.geolocation.getCurrentPosition(
+                    updatePos => {
+                        const updatedLatLng = L.latLng(updatePos.coords.latitude, updatePos.coords.longitude);
+                        userMarker.setLatLng(updatedLatLng).bindPopup(`Updated Location (Acc: ${updatePos.coords.accuracy.toFixed(0)}m)`);
+                        map.panTo(updatedLatLng);
+                        
+                        // Only re-route if accuracy is decent (e.g., < 150m) to avoid errors
+                        if (updatePos.coords.accuracy < 150) {
+                            createRoute(updatedLatLng);
+                        } else {
+                            straightLineFallback(updatedLatLng); // Fallback if update is poor
+                        }
+                    },
+                    () => { /* ignore update errors */ },
+                    { enableHighAccuracy: false, timeout: 10000 }
+                );
+            }, 30000); // Check for location update every 30 seconds
+
+        },
+        err => {
+            // Geolocation Failure (Failed to get location within 20s)
+            directionsList.innerHTML = `
+                ❌ <strong>Location Tracking Failed!</strong><br>
+                **Error:** ${err.message}. Failed to get position within 20 seconds.
+                <br><em>Please check if location services are enabled or try moving to an open area.</em>
+            `;
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            // ⭐ Final attempt at a long timeout for 3G/4G
+            timeout: 20000 
         }
-      }
-
-      steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
-      steps += `<em>Estimated Time:</em> ${timeMin} mins`;
-
-      directionsList.innerHTML = steps;
-    });
-  }
-
-  // Watch live location and update route
-  navigator.geolocation.watchPosition(
-    pos => {
-      const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      updateRoute(userLatLng);
-    },
-    err => {
-      alert("Location tracking failed: " + err.message);
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 3000,
-      timeout: 7000
-    }
-  );
+    );
 }
 window.onload = () => {
   loadListings();
