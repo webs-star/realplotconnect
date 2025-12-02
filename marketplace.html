@@ -366,7 +366,6 @@ listingsDiv.appendChild(card);
     }
   });
 }
-
 function showMapForListing(destLat, destLng, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -394,42 +393,17 @@ function showMapForListing(destLat, destLng, containerId) {
 
   let userMarker = null;
   let routeControl = null;
+  let straightLine = null; // Variable to hold the straight line layer
   
-  // Define the accuracy threshold to avoid OSRM snapping errors
-  const ACCURACY_THRESHOLD = 100; // meters
+  const ACCURACY_THRESHOLD = 100; // meters (Above this, we warn/abort road routing)
+  const STRAIGHT_LINE_DISTANCE = 200; // meters (Below this distance, we switch to straight line)
 
-  // Pass accuracyMeters to updateRoute
+
   function updateRoute(userLatLng, accuracyMeters) { 
     
-    // 🔑 FIX: Stop the route calculation if GPS is too poor
-    if (accuracyMeters > ACCURACY_THRESHOLD) {
-      directionsList.innerHTML = `
-        ⚠️ **Improving Location...**<br>
-        GPS accuracy is too low (${accuracyMeters.toFixed(0)}m). 
-        Route calculation aborted to prevent OSRM server error (the 0.8km failure).
-        Please wait for a better signal.
-      `;
-      
-      // Still show user's location, even if inaccurate
-      if (userMarker) {
-        userMarker.setLatLng(userLatLng).bindPopup(`Accuracy: ${accuracyMeters.toFixed(0)}m`);
-      } else {
-        userMarker = L.marker(userLatLng).addTo(map).bindPopup(`Accuracy: ${accuracyMeters.toFixed(0)}m`);
-      }
-      
-      if (routeControl) {
-        map.removeControl(routeControl);
-        routeControl = null;
-      }
-      return; // Stop execution here
-    }
-    // End of GPS Accuracy Check
-    
-    // Resume successful path (Accuracy is acceptable)
-    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating route...</em>";
-
+    // Update User Marker (always show location)
     if (userMarker) {
-      userMarker.setLatLng(userLatLng).bindPopup("You are here (Accurate)");
+      userMarker.setLatLng(userLatLng).bindPopup(`Accuracy: ${accuracyMeters.toFixed(0)}m`);
     } else {
       userMarker = L.marker(userLatLng, {
         icon: L.icon({
@@ -437,12 +411,52 @@ function showMapForListing(destLat, destLng, containerId) {
           iconSize: [25, 25],
           iconAnchor: [12, 12]
         })
-      }).addTo(map).bindPopup("You are here");
+      }).addTo(map).bindPopup(`You are here (Accuracy: ${accuracyMeters.toFixed(0)}m)`);
     }
 
+    // Calculate straight-line distance (in meters)
+    const distanceToDestination = userLatLng.distanceTo(destinationLatLng);
+    
+    // Cleanup previous layers
     if (routeControl) {
       map.removeControl(routeControl);
+      routeControl = null;
     }
+    if (straightLine) {
+        map.removeLayer(straightLine);
+        straightLine = null;
+    }
+
+
+    // --- 🔑 HYBRID ROUTING LOGIC ---
+
+    // Condition 1: Use straight line if distance is very short
+    // Condition 2: Use straight line if GPS accuracy is too poor for road snapping (3G/4G failure)
+    if (distanceToDestination < STRAIGHT_LINE_DISTANCE || accuracyMeters > ACCURACY_THRESHOLD) {
+        
+        // Draw the straight line
+        straightLine = L.polyline([userLatLng, destinationLatLng], {
+            color: 'red', 
+            weight: 3, 
+            dashArray: '10, 10', 
+            opacity: 0.7
+        }).addTo(map);
+
+        // Update directions
+        directionsList.innerHTML = `
+            📍 <strong>Destination is Near!</strong><br>
+            Remaining distance (straight line): **${(distanceToDestination / 1000).toFixed(2)} km** (${distanceToDestination.toFixed(0)}m)<br>
+            ${accuracyMeters > ACCURACY_THRESHOLD ? 
+                `⚠️ **Poor GPS:** Showing straight line only. Move closer or find a clearer signal.` : 
+                `You are within ${STRAIGHT_LINE_DISTANCE}m. Look around!`
+            }
+        `;
+        return; // Stop execution
+    }
+
+    // --- ROAD ROUTING (If far and accurate) ---
+    
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating route via roads...</em>";
 
     routeControl = L.Routing.control({
       waypoints: [userLatLng, destinationLatLng],
@@ -455,12 +469,22 @@ function showMapForListing(destLat, destLng, containerId) {
       }
     }).addTo(map);
     
-    // Add routing error handler for any other failures (timeouts, etc.)
+    // Add routing error handler (for network/server failure)
     routeControl.on('routingerror', function (e) {
       directionsList.innerHTML = `
-        ❌ <strong>Failed to load route.</strong><br>
-        **Error:** ${e.error.message || "Routing server timeout or network issue."}<br>
+        ❌ <strong>Road Routing Failed.</strong><br>
+        **Error:** ${e.error.message || "Routing server failure."}<br>
+        <em>Switching to straight-line distance.</em>
       `;
+      
+      // FALLBACK TO STRAIGHT LINE ON NETWORK/SERVER FAILURE
+      if (straightLine) { map.removeLayer(straightLine); }
+      straightLine = L.polyline([userLatLng, destinationLatLng], {
+            color: 'orange', 
+            weight: 3, 
+            dashArray: '5, 5', 
+            opacity: 0.7
+        }).addTo(map);
     });
 
     routeControl.on('routesfound', function (e) {
@@ -482,8 +506,8 @@ function showMapForListing(destLat, destLng, containerId) {
         }
       }
 
-      steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
-      steps += `<em>Estimated Time:</em> ${timeMin} mins`;
+      steps += `<br><em>Total Distance:</em> **${distanceKm} km**<br>`;
+      steps += `<em>Estimated Time:</em> **${timeMin} mins**`;
 
       directionsList.innerHTML = steps;
     });
@@ -493,7 +517,7 @@ function showMapForListing(destLat, destLng, containerId) {
   navigator.geolocation.watchPosition(
     pos => {
       const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      const accuracyMeters = pos.coords.accuracy; // Pass the accuracy!
+      const accuracyMeters = pos.coords.accuracy;
       updateRoute(userLatLng, accuracyMeters);
     },
     err => {
