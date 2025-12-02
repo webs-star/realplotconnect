@@ -396,80 +396,110 @@ listingsDiv.appendChild(card);
 
   let userMarker = null;
   let routeControl = null;
-function updateRoute(userLatLng) {
-    if (userMarker) {
-        userMarker.setLatLng(userLatLng);
-    } else {
-        userMarker = L.marker(userLatLng, {
-            icon: L.icon({
-                iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-                iconSize: [25, 25],
-                iconAnchor: [12, 12]
-            })
-        }).addTo(map).bindPopup("You are here");
-    }
+function showMapForListing(destLat, destLng, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
 
-    if (routeControl) {
-        map.removeControl(routeControl);
-        routeControl = null;
-    }
+    const mapDiv = document.createElement("div");
+    mapDiv.style.height = "300px";
+    mapDiv.style.marginTop = "10px";
+    mapDiv.style.borderRadius = "10px";
+    container.appendChild(mapDiv);
 
-    // calculate straight-line distance
-    const straightDistance = map.distance(userLatLng, destinationLatLng);
+    const directionsList = document.createElement("div");
+    directionsList.className = "directions-text";
+    directionsList.style.marginTop = "10px";
+    directionsList.style.padding = "10px";
+    directionsList.style.background = "#f9f9f9";
+    directionsList.style.borderRadius = "8px";
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
+    container.appendChild(directionsList);
 
-    if (straightDistance < 50) {
-        // very close: show simple distance and line, skip routing
-        directionsList.innerHTML = `<strong>Distance to property:</strong> ${straightDistance.toFixed(1)} m`;
-        // draw a straight green line
-        L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
-        return;
-    }
+    const map = L.map(mapDiv).setView([destLat, destLng], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // farther away: use normal route
-    routeControl = L.Routing.control({
-        waypoints: [userLatLng, destinationLatLng],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        createMarker: () => null,
-        show: false,
-        lineOptions: { styles: [{ color: 'blue', weight: 4, opacity: 0.8 }] }
-    }).addTo(map);
+    const destinationLatLng = L.latLng(destLat, destLng);
+    L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
 
-    routeControl.on('routesfound', function (e) {
-        const route = e.routes[0];
-        const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-        const timeMin = (route.summary.totalTime / 60).toFixed(0);
+    let userMarker = null;
+    let routeControl = null;
 
-        let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
-        const instructions = route.instructions || [];
-
-        const formatter = new L.Routing.Formatter();
-        if (instructions.length === 0 && route.instructions === undefined) {
-            route.instructions = formatter._getInstructions.call({options:{}}, route);
+    function updateRoute(userLatLng) {
+        if (userMarker) {
+            userMarker.setLatLng(userLatLng);
+        } else {
+            userMarker = L.marker(userLatLng, {
+                icon: L.icon({
+                    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+                    iconSize: [25, 25],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup("You are here");
         }
 
-        for (const step of route.instructions) {
-            if (step.text) {
-                steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+        // Remove previous route if any
+        if (routeControl) {
+            map.removeControl(routeControl);
+            routeControl = null;
+        }
+
+        const straightDistance = map.distance(userLatLng, destinationLatLng);
+
+        // If very close, skip routing and show straight line
+        if (straightDistance < 100) { // 100 meters threshold
+            directionsList.innerHTML = `<strong>Distance to property:</strong> ${straightDistance.toFixed(1)} m`;
+            
+            // Draw straight green line
+            L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
+            return;
+        }
+
+        // Farther away, use routing
+        routeControl = L.Routing.control({
+            waypoints: [userLatLng, destinationLatLng],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            createMarker: () => null,
+            show: false,
+            lineOptions: { styles: [{ color: 'blue', weight: 4, opacity: 0.8 }] }
+        }).addTo(map);
+
+        routeControl.on('routesfound', function (e) {
+            const route = e.routes[0];
+            const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+            const timeMin = (route.summary.totalTime / 60).toFixed(0);
+
+            let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
+            const instructions = route.instructions || [];
+
+            const formatter = new L.Routing.Formatter();
+            if (instructions.length === 0 && route.instructions === undefined) {
+                route.instructions = formatter._getInstructions.call({options:{}}, route);
             }
-        }
 
-        steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
-        steps += `<em>Estimated Time:</em> ${timeMin} mins`;
+            for (const step of route.instructions) {
+                if (step.text) {
+                    steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+                }
+            }
 
-        directionsList.innerHTML = steps;
-    });
+            steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
+            steps += `<em>Estimated Time:</em> ${timeMin} mins`;
+
+            directionsList.innerHTML = steps;
+        });
+    }
+
+    // Watch live location and update route
+    navigator.geolocation.watchPosition(
+        pos => {
+            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+            updateRoute(userLatLng);
+        },
+        err => alert("Location tracking failed: " + err.message),
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
+    );
 }
-
-// Watch live location and update route
-navigator.geolocation.watchPosition(
-    pos => {
-        const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-        updateRoute(userLatLng);
-    },
- err => alert("Location tracking failed: " + err.message),
-    { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000
-    } ); } window.onload = () => { loadListings(); };
 
 
 function openChat(contact, location, type, listingId) {
