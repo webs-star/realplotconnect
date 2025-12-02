@@ -3,8 +3,8 @@
 <head>
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
- <meta name="google-site-verification" content="U5XTc52kcwPqUunl-p9uagUoK3-O9wwGZhr7G1fL2bo" />
+  <meta name="google-site-verification" content="ZuK2pvozDS96vm0_IRjSYEsTqSdC8FJCIgJdAitGf0U" />
+
   <!-- Title and SEO -->
 <title>RealPlot Kenya – Find Plots, Houses & Rentals Near You</title>
 
@@ -368,105 +368,118 @@ listingsDiv.appendChild(card);
 }
 
 
+function showMapForListing(destLat, destLng, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
 
-  function showMapForListing(destLat, destLng, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
+    const mapDiv = document.createElement("div");
+    mapDiv.style.height = "330px";
+    mapDiv.style.marginTop = "10px";
+    mapDiv.style.borderRadius = "10px";
+    container.appendChild(mapDiv);
 
-  const mapDiv = document.createElement("div");
-  mapDiv.style.height = "300px";
-  mapDiv.style.marginTop = "10px";
-  mapDiv.style.borderRadius = "10px";
-  container.appendChild(mapDiv);
+    const directionsList = document.createElement("div");
+    directionsList.style.marginTop = "10px";
+    directionsList.style.padding = "10px";
+    directionsList.style.background = "#f9f9f9";
+    directionsList.style.borderRadius = "8px";
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
+    container.appendChild(directionsList);
 
-  const directionsList = document.createElement("div");
-  directionsList.className = "directions-text";
-  directionsList.style.marginTop = "10px";
-  directionsList.style.padding = "10px";
-  directionsList.style.background = "#f9f9f9";
-  directionsList.style.borderRadius = "8px";
-  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
-  container.appendChild(directionsList);
+    // initialize map
+    const map = L.map(mapDiv);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  const map = L.map(mapDiv).setView([destLat, destLng], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    const destinationLatLng = L.latLng(destLat, destLng);
+    L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
 
-  const destinationLatLng = L.latLng(destLat, destLng);
-  L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
+    let userMarker = null;
+    let routeControl = null;
+    let lastGoodPosition = null;
+    let firstCenter = true;
 
-  let userMarker = null;
-  let routeControl = null;
-
-  function updateRoute(userLatLng) {
-    if (userMarker) {
-      userMarker.setLatLng(userLatLng);
-    } else {
-      userMarker = L.marker(userLatLng, {
-        icon: L.icon({
-          iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-          iconSize: [25, 25],
-          iconAnchor: [12, 12]
-        })
-      }).addTo(map).bindPopup("You are here");
+    // Haversine distance for filtering noisy GPS jumps
+    function distanceMeters(a, b) {
+        return map.distance(a, b);
     }
 
-    if (routeControl) {
-      map.removeControl(routeControl);
-    }
+    // main route updater
+    function updateRoute(userLatLng) {
+        if (!lastGoodPosition) lastGoodPosition = userLatLng;
 
-    routeControl = L.Routing.control({
-      waypoints: [userLatLng, destinationLatLng],
-      routeWhileDragging: false,
-      addWaypoints: false,
-      createMarker: () => null,
-      show: false,
-      lineOptions: {
-        styles: [{ color: 'blue', weight: 4, opacity: 0.8 }]
-      }
-    }).addTo(map);
-
-    routeControl.on('routesfound', function (e) {
-      const route = e.routes[0];
-      const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-      const timeMin = (route.summary.totalTime / 60).toFixed(0);
-
-      let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
-      const instructions = route.instructions || [];
-
-      // Leaflet sometimes leaves instructions empty, fix it manually
-      const formatter = new L.Routing.Formatter();
-      if (instructions.length === 0 && route.instructions === undefined) {
-        const legs = route.instructions = formatter._getInstructions.call({options:{}}, route);
-      }
-
-      for (const step of instructions) {
-        if (step.text) {
-          steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+        // filter out GPS noise (>35m sudden jumps)
+        if (distanceMeters(lastGoodPosition, userLatLng) > 35) {
+            return; // ignore this inaccurate reading
         }
-      }
 
-      steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
-      steps += `<em>Estimated Time:</em> ${timeMin} mins`;
+        lastGoodPosition = userLatLng;
 
-      directionsList.innerHTML = steps;
-    });
-  }
+        if (firstCenter) {
+            map.setView(userLatLng, 16);
+            firstCenter = false;
+        }
 
-  // Watch live location and update route
-  navigator.geolocation.watchPosition(
-    pos => {
-      const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      updateRoute(userLatLng);
-    },
-    err => {
-      alert("Location tracking failed: " + err.message);
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 3000,
-      timeout: 7000
+        if (userMarker) {
+            userMarker.setLatLng(userLatLng);
+        } else {
+            userMarker = L.marker(userLatLng, {
+                icon: L.icon({
+                    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                })
+            }).addTo(map).bindPopup("You");
+        }
+
+        if (routeControl) {
+            try { map.removeControl(routeControl); } catch (e) {}
+        }
+
+        routeControl = L.Routing.control({
+            waypoints: [userLatLng, destinationLatLng],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            show: false,
+            lineOptions: {
+                styles: [{ color: "blue", weight: 5, opacity: 0.9 }]
+            },
+            createMarker: () => null
+        }).addTo(map);
+
+        routeControl.on("routesfound", e => {
+            const route = e.routes[0];
+            const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+            const timeMin = Math.round(route.summary.totalTime / 60);
+
+            const formatter = new L.Routing.Formatter();
+            const steps = formatter._getInstructions({route: route});
+
+            let html = `<strong>Live Step-by-Step Directions:</strong><br><br>`;
+            steps.forEach(step => {
+                html += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+            });
+
+            html += `<br><b>Total Distance:</b> ${distanceKm} km<br>`;
+            html += `<b>Estimated Time:</b> ${timeMin} mins`;
+
+            directionsList.innerHTML = html;
+        });
     }
-  );
+
+    // watch GPS in high-accuracy mode
+    navigator.geolocation.watchPosition(
+        pos => {
+            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+            updateRoute(userLatLng);
+        },
+        err => alert("GPS error: " + err.message),
+        {
+            enableHighAccuracy: true,   // ★ BEST ACCURACY
+            maximumAge: 0,             // no cached position
+            timeout: 5000              // retry fast
+        }
+    );
 }
 window.onload = () => {
   loadListings();
