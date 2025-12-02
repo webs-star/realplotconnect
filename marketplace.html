@@ -448,22 +448,23 @@ function updateRoute(userLatLng) {
     // ★★★ ROUTING USING OPENROUTESERVICE ★★★
     routeControl = L.Routing.control({
     waypoints: [userLatLng, destinationLatLng],
-    router: new L.Routing.OpenRouteService.default(
+    router: L.Routing.openRouteService(
             "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjE1NTNjMTVmY2Q1MjQxYzk4Yjg5YzkxNDI1OTM0OTgzIiwiaCI6Im11cm11cjY0In0=",
-            {
-                profile: "driving-car",
-                language: "en"
-            }
-        ),
-        routeWhileDragging: false,
-        addWaypoints: false,
-        draggableWaypoints: false,
-        show: false,
-        lineOptions: {
-            styles: [{ color: "blue", weight: 5, opacity: 0.9 }]
-        },
-        createMarker: () => null
-    }).addTo(map);
+          {
+            profile: "driving-car",
+            language: "en"
+        }
+    ),
+    routeWhileDragging: false,
+    addWaypoints: false,
+    draggableWaypoints: false,
+    show: false,
+    lineOptions: {
+        styles: [{ color: "blue", weight: 5, opacity: 0.9 }]
+    },
+    createMarker: () => null
+}).addTo(map);
+
 
     // when route is ready
     routeControl.on("routesfound", e => {
