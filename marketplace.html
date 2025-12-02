@@ -230,7 +230,6 @@ ul.description {
 <div id="listings"></div>
 
 <script>
- let straightLine = null; // global per map instance
   const firebaseConfig = {
     apiKey: "AIzaSyDLTAd2u0IlhA4Gm4-0tTSzLUDHFYj045g",
     authDomain: "realestate-afbe6.firebaseapp.com",
@@ -368,120 +367,119 @@ listingsDiv.appendChild(card);
   });
 }
 
-function showMapForListing(destLat, destLng, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
 
-    const mapDiv = document.createElement("div");
-    mapDiv.style.height = "300px";
-    mapDiv.style.marginTop = "10px";
-    mapDiv.style.borderRadius = "10px";
-    container.appendChild(mapDiv);
 
-    const directionsList = document.createElement("div");
-    directionsList.className = "directions-text";
-    directionsList.style.marginTop = "10px";
-    directionsList.style.padding = "10px";
-    directionsList.style.background = "#f9f9f9";
-    directionsList.style.borderRadius = "8px";
-    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
-    container.appendChild(directionsList);
+  function showMapForListing(destLat, destLng, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
 
-    const map = L.map(mapDiv).setView([destLat, destLng], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  const mapDiv = document.createElement("div");
+  mapDiv.style.height = "300px";
+  mapDiv.style.marginTop = "10px";
+  mapDiv.style.borderRadius = "10px";
+  container.appendChild(mapDiv);
 
-    const destinationLatLng = L.latLng(destLat, destLng);
-    L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
+  const directionsList = document.createElement("div");
+  directionsList.className = "directions-text";
+  directionsList.style.marginTop = "10px";
+  directionsList.style.padding = "10px";
+  directionsList.style.background = "#f9f9f9";
+  directionsList.style.borderRadius = "8px";
+  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
+  container.appendChild(directionsList);
 
-    let userMarker = null;
-    let routeControl = null;
+  const map = L.map(mapDiv).setView([destLat, destLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    function updateRoute(userLatLng) {
-        // Update user marker
-        if (userMarker) {
-            userMarker.setLatLng(userLatLng);
-        } else {
-            userMarker = L.marker(userLatLng, {
-                icon: L.icon({
-                    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-                    iconSize: [25, 25],
-                    iconAnchor: [12, 12]
-                })
-            }).addTo(map).bindPopup("You are here");
-        }
+  const destinationLatLng = L.latLng(destLat, destLng);
+  L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
 
-        // Remove previous route or line
-        if (routeControl) {
-            map.removeControl(routeControl);
-            routeControl = null;
-        }
-        if (straightLine) {
-            map.removeLayer(straightLine);
-            straightLine = null;
-        }
+  let userMarker = null;
+  let routeControl = null;
 
-        const straightDistance = map.distance(userLatLng, destinationLatLng);
-
-        // At property: <20 m
-        if (straightDistance <= 20) {
-            directionsList.innerHTML = `<strong>Distance to property:</strong> 0 m ✅`;
-            straightLine = L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
-            return;
-        }
-
-        // Short distance: <300 m, show straight line
-        if (straightDistance <= 300) {
-            directionsList.innerHTML = `<strong>Distance to property:</strong> ${straightDistance.toFixed(0)} m`;
-            straightLine = L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
-            return;
-        }
-
-        // Farther away: use routing
-        routeControl = L.Routing.control({
-            waypoints: [userLatLng, destinationLatLng],
-            routeWhileDragging: false,
-            addWaypoints: false,
-            createMarker: () => null,
-            show: false,
-            lineOptions: { styles: [{ color: 'blue', weight: 4, opacity: 0.8 }] }
-        }).addTo(map);
-
-        routeControl.on('routesfound', function (e) {
-            const route = e.routes[0];
-            const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-            const timeMin = (route.summary.totalTime / 60).toFixed(0);
-
-            let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
-            const formatter = new L.Routing.Formatter();
-            const instructions = formatter._getInstructions.call({ options: {} }, route);
-
-            for (const step of instructions) {
-                if (step.text) {
-                    steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
-                }
-            }
-
-            steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
-            steps += `<em>Estimated Time:</em> ${timeMin} mins`;
-            directionsList.innerHTML = steps;
-        });
+  function updateRoute(userLatLng) {
+    if (userMarker) {
+      userMarker.setLatLng(userLatLng);
+    } else {
+      userMarker = L.marker(userLatLng, {
+        icon: L.icon({
+          iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        })
+      }).addTo(map).bindPopup("You are here");
     }
 
-    // Watch live location
-    navigator.geolocation.watchPosition(
-        pos => {
-            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-            updateRoute(userLatLng);
-        },
-        err => alert("Location tracking failed: " + err.message),
-        { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
-    );
-}
- 
-window.onload = () => {
-    loadListings();
-};
+    if (routeControl) {
+      map.removeControl(routeControl);
+    }
 
+    routeControl = L.Routing.control({
+      waypoints: [userLatLng, destinationLatLng],
+      routeWhileDragging: false,
+      addWaypoints: false,
+      createMarker: () => null,
+      show: false,
+      lineOptions: {
+        styles: [{ color: 'blue', weight: 4, opacity: 0.8 }]
+      }
+    }).addTo(map);
+
+    routeControl.on('routesfound', function (e) {
+      const route = e.routes[0];
+      const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+      const timeMin = (route.summary.totalTime / 60).toFixed(0);
+
+      let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
+      const instructions = route.instructions || [];
+
+      // Leaflet sometimes leaves instructions empty, fix it manually
+      const formatter = new L.Routing.Formatter();
+      if (instructions.length === 0 && route.instructions === undefined) {
+        const legs = route.instructions = formatter._getInstructions.call({options:{}}, route);
+      }
+
+      for (const step of instructions) {
+        if (step.text) {
+          steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+        }
+      }
+
+      steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
+      steps += `<em>Estimated Time:</em> ${timeMin} mins`;
+
+      directionsList.innerHTML = steps;
+    });
+  }
+
+  // Watch live location and update route
+ navigator.geolocation.watchPosition(
+    pos => {
+      const accuracyMeters = pos.coords.accuracy;
+      
+      // ⭐ NEW LOGIC: Only update if accuracy is better than a threshold (e.g., 50 meters)
+      if (accuracyMeters <= 50) { 
+        const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+        updateRoute(userLatLng);
+      } else {
+        // Optionally, inform the user that location is poor
+        console.warn(`Location update skipped: Accuracy is too low (${accuracyMeters.toFixed(0)}m)`);
+        // You could update the directionsList with a message here
+      }
+    },
+    err => {
+      alert("Location tracking failed: " + err.message);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0, // Request a fresh position immediately
+      timeout: 10000 // Give more time to get a good fix
+    }
+  );
+}
+window.onload = () => {
+  loadListings();
+};
 
 
 function openChat(contact, location, type, listingId) {
