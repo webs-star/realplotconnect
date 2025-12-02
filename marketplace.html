@@ -367,7 +367,6 @@ listingsDiv.appendChild(card);
   });
 }
 
-
 function showMapForListing(destLat, destLng, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -384,7 +383,7 @@ function showMapForListing(destLat, destLng, containerId) {
   directionsList.style.padding = "10px";
   directionsList.style.background = "#f9f9f9";
   directionsList.style.borderRadius = "8px";
-  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
+  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Attempting to get user location...</em>";
   container.appendChild(directionsList);
 
   const map = L.map(mapDiv).setView([destLat, destLng], 13);
@@ -395,11 +394,42 @@ function showMapForListing(destLat, destLng, containerId) {
 
   let userMarker = null;
   let routeControl = null;
+  
+  // Define the accuracy threshold to avoid OSRM snapping errors
+  const ACCURACY_THRESHOLD = 100; // meters
 
-  function updateRoute(userLatLng) {
-    // Start route calculation immediately upon receiving *any* position fix
+  // Pass accuracyMeters to updateRoute
+  function updateRoute(userLatLng, accuracyMeters) { 
+    
+    // 🔑 FIX: Stop the route calculation if GPS is too poor
+    if (accuracyMeters > ACCURACY_THRESHOLD) {
+      directionsList.innerHTML = `
+        ⚠️ **Improving Location...**<br>
+        GPS accuracy is too low (${accuracyMeters.toFixed(0)}m). 
+        Route calculation aborted to prevent OSRM server error (the 0.8km failure).
+        Please wait for a better signal.
+      `;
+      
+      // Still show user's location, even if inaccurate
+      if (userMarker) {
+        userMarker.setLatLng(userLatLng).bindPopup(`Accuracy: ${accuracyMeters.toFixed(0)}m`);
+      } else {
+        userMarker = L.marker(userLatLng).addTo(map).bindPopup(`Accuracy: ${accuracyMeters.toFixed(0)}m`);
+      }
+      
+      if (routeControl) {
+        map.removeControl(routeControl);
+        routeControl = null;
+      }
+      return; // Stop execution here
+    }
+    // End of GPS Accuracy Check
+    
+    // Resume successful path (Accuracy is acceptable)
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating route...</em>";
+
     if (userMarker) {
-      userMarker.setLatLng(userLatLng);
+      userMarker.setLatLng(userLatLng).bindPopup("You are here (Accurate)");
     } else {
       userMarker = L.marker(userLatLng, {
         icon: L.icon({
@@ -413,9 +443,6 @@ function showMapForListing(destLat, destLng, containerId) {
     if (routeControl) {
       map.removeControl(routeControl);
     }
-    
-    // Explicitly update the directions list to show we are waiting for the server
-    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating route...</em>";
 
     routeControl = L.Routing.control({
       waypoints: [userLatLng, destinationLatLng],
@@ -428,7 +455,7 @@ function showMapForListing(destLat, destLng, containerId) {
       }
     }).addTo(map);
     
-    // ⭐ NEW: Add routing error handler (the only robust addition needed)
+    // Add routing error handler for any other failures (timeouts, etc.)
     routeControl.on('routingerror', function (e) {
       directionsList.innerHTML = `
         ❌ <strong>Failed to load route.</strong><br>
@@ -444,7 +471,6 @@ function showMapForListing(destLat, destLng, containerId) {
       let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
       const instructions = route.instructions || [];
 
-      // Leaflet sometimes leaves instructions empty, fix it manually
       const formatter = new L.Routing.Formatter();
       if (instructions.length === 0 && route.instructions === undefined) {
         const legs = route.instructions = formatter._getInstructions.call({options:{}}, route);
@@ -467,15 +493,14 @@ function showMapForListing(destLat, destLng, containerId) {
   navigator.geolocation.watchPosition(
     pos => {
       const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      updateRoute(userLatLng);
+      const accuracyMeters = pos.coords.accuracy; // Pass the accuracy!
+      updateRoute(userLatLng, accuracyMeters);
     },
     err => {
-      // ⭐ FIX: Display Geolocation error on the screen instead of just an alert
       directionsList.innerHTML = `
         ❌ **Location Tracking Failed!**<br>
         The device could not get your position within 7 seconds. Please check your location settings/signal.
       `;
-      // alert("Location tracking failed: " + err.message); // Keep this commented out or remove it
     },
     {
       enableHighAccuracy: true,
@@ -484,7 +509,6 @@ function showMapForListing(destLat, destLng, containerId) {
     }
   );
 }
- 
 window.onload = () => { loadListings(); };
 
 function openChat(contact, location, type, listingId) {
