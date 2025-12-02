@@ -396,33 +396,7 @@ listingsDiv.appendChild(card);
 
   let userMarker = null;
   let routeControl = null;
-function showMapForListing(destLat, destLng, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
 
-    const mapDiv = document.createElement("div");
-    mapDiv.style.height = "300px";
-    mapDiv.style.marginTop = "10px";
-    mapDiv.style.borderRadius = "10px";
-    container.appendChild(mapDiv);
-
-    const directionsList = document.createElement("div");
-    directionsList.className = "directions-text";
-    directionsList.style.marginTop = "10px";
-    directionsList.style.padding = "10px";
-    directionsList.style.background = "#f9f9f9";
-    directionsList.style.borderRadius = "8px";
-    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
-    container.appendChild(directionsList);
-
-    const map = L.map(mapDiv).setView([destLat, destLng], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-    const destinationLatLng = L.latLng(destLat, destLng);
-    L.marker(destinationLatLng).addTo(map).bindPopup("Listing Location");
-
-    let userMarker = null;
-    let routeControl = null;
 function updateRoute(userLatLng) {
     if (userMarker) {
         userMarker.setLatLng(userLatLng);
