@@ -368,6 +368,7 @@ listingsDiv.appendChild(card);
 }
 
 
+
 function showMapForListing(destLat, destLng, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -384,7 +385,6 @@ function showMapForListing(destLat, destLng, containerId) {
   directionsList.style.padding = "10px";
   directionsList.style.background = "#f9f9f9";
   directionsList.style.borderRadius = "8px";
-   // Updated initial message
   directionsList.innerHTML = "<strong>Directions:</strong><br><em>Attempting to get high-accuracy location...</em>"; 
   container.appendChild(directionsList);
 
@@ -400,6 +400,7 @@ function showMapForListing(destLat, destLng, containerId) {
   // Define the accuracy threshold for high-quality routing
   const ACCURACY_THRESHOLD = 50; // meters
 
+  // The core function that calculates the route and updates the map
   function updateRoute(userLatLng, accuracyMeters) {
     
     // 1. GPS Accuracy Check & User Feedback
@@ -414,8 +415,8 @@ function showMapForListing(destLat, destLng, containerId) {
     
     // Update loading message for slow connections before routing starts
     directionsList.innerHTML = `
-      ⏳ **Calculating route on slow connection...**<br>
-      This may take up to 25 seconds on 3G/Edge. Please wait.
+      ⏳ **Calculating route...**<br>
+      On slow connections, this may take up to 25 seconds. Please wait.
     `;
     
     // 2. Update User Marker
@@ -428,7 +429,7 @@ function showMapForListing(destLat, destLng, containerId) {
           iconSize: [25, 25],
           iconAnchor: [12, 12]
         })
-      }).addTo(map).bindPopup("You are here");
+      }).addTo(map).bindPopup("You are here (Accuracy: " + accuracyMeters.toFixed(0) + "m)");
     }
 
     if (routeControl) {
@@ -439,10 +440,10 @@ function showMapForListing(destLat, destLng, containerId) {
     routeControl = L.Routing.control({
       waypoints: [userLatLng, destinationLatLng],
       
-      // 🔑 FIX: Explicitly define the router and increase timeout
+      // Explicitly set the OSRM router and the longer timeout for stability
       router: L.Routing.osrmv1({
         serviceUrl: 'https://router.project-osrm.org/route/v1',
-        timeout: 25000 // Increased timeout to 25 seconds
+        timeout: 25000 // Increased timeout to 25 seconds for 3G/slow connections
       }), 
       
       routeWhileDragging: false,
@@ -454,13 +455,13 @@ function showMapForListing(destLat, destLng, containerId) {
       }
     }).addTo(map);
 
-    // 4. Add Routing Error Handler (catches "timeout")
+    // 4. Add Routing Error Handler (catches network issues and timeouts)
     routeControl.on('routingerror', function (e) {
       console.error("Routing Error:", e.error);
       directionsList.innerHTML = `
         ❌ <strong>Failed to load directions.</strong><br>
         **Error:** ${e.error.message || "Unknown server error."}<br>
-        <em>Try moving to a place with better mobile signal or wait a moment.</em>
+        <em>Try checking your connection or wait a moment for the server to respond.</em>
       `;
     });
 
@@ -505,11 +506,13 @@ function showMapForListing(destLat, destLng, containerId) {
     {
       enableHighAccuracy: true,
       maximumAge: 0, 
-      // 🔑 FIX: Increased Geolocation timeout for 3G
+      // Increased Geolocation timeout for slow networks
       timeout: 15000 
     }
   );
 }
+
+ 
 window.onload = () => { loadListings(); };
 
 function openChat(contact, location, type, listingId) {
