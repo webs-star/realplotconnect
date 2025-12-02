@@ -65,10 +65,17 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+  <!-- Leaflet core -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Routing Machine -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<!-- ✔ Correct OpenRouteService plugin -->
+<script src="https://cdn.jsdelivr.net/npm/lrm-openrouteservice@1.2.1/dist/lrm-openrouteservice.min.js"></script>
+
 
 
   <style>
@@ -403,84 +410,97 @@ function showMapForListing(destLat, destLng, containerId) {
         return map.distance(a, b);
     }
 
-    // main route updater
-    function updateRoute(userLatLng) {
-        if (!lastGoodPosition) lastGoodPosition = userLatLng;
+  // main route updater using OpenRouteService (ORS)
+function updateRoute(userLatLng) {
+    if (!lastGoodPosition) lastGoodPosition = userLatLng;
 
-        // filter out GPS noise (>35m sudden jumps)
-        if (distanceMeters(lastGoodPosition, userLatLng) > 35) {
-            return; // ignore this inaccurate reading
-        }
-
-        lastGoodPosition = userLatLng;
-
-        if (firstCenter) {
-            map.setView(userLatLng, 16);
-            firstCenter = false;
-        }
-
-        if (userMarker) {
-            userMarker.setLatLng(userLatLng);
-        } else {
-            userMarker = L.marker(userLatLng, {
-                icon: L.icon({
-                    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
-                })
-            }).addTo(map).bindPopup("You");
-        }
-
-        if (routeControl) {
-            try { map.removeControl(routeControl); } catch (e) {}
-        }
-
-        routeControl = L.Routing.control({
-            waypoints: [userLatLng, destinationLatLng],
-            routeWhileDragging: false,
-            addWaypoints: false,
-            draggableWaypoints: false,
-            show: false,
-            lineOptions: {
-                styles: [{ color: "blue", weight: 5, opacity: 0.9 }]
-            },
-            createMarker: () => null
-        }).addTo(map);
-
-        routeControl.on("routesfound", e => {
-            const route = e.routes[0];
-            const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-            const timeMin = Math.round(route.summary.totalTime / 60);
-
-            const formatter = new L.Routing.Formatter();
-            const steps = formatter._getInstructions({route: route});
-
-            let html = `<strong>Live Step-by-Step Directions:</strong><br><br>`;
-            steps.forEach(step => {
-                html += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
-            });
-
-            html += `<br><b>Total Distance:</b> ${distanceKm} km<br>`;
-            html += `<b>Estimated Time:</b> ${timeMin} mins`;
-
-            directionsList.innerHTML = html;
-        });
+    // filter out GPS noise (>35m sudden jumps)
+    if (distanceMeters(lastGoodPosition, userLatLng) > 35) {
+        return; // ignore inaccurate reading
     }
 
-    // watch GPS in high-accuracy mode
-    navigator.geolocation.watchPosition(
-        pos => {
-            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-            updateRoute(userLatLng);
+    lastGoodPosition = userLatLng;
+
+    // first auto-center
+    if (firstCenter) {
+        map.setView(userLatLng, 16);
+        firstCenter = false;
+    }
+
+    // update or create user marker
+    if (userMarker) {
+        userMarker.setLatLng(userLatLng);
+    } else {
+        userMarker = L.marker(userLatLng, {
+            icon: L.icon({
+                iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            })
+        }).addTo(map).bindPopup("You");
+    }
+
+    // remove previous route
+    if (routeControl) {
+        try { map.removeControl(routeControl); } catch (e) {}
+    }
+
+    // ★★★ ROUTING USING OPENROUTESERVICE ★★★
+    routeControl = L.Routing.control({
+        waypoints: [userLatLng, destinationLatLng],
+        router: L.Routing.openrouteservice(
+            "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjE1NTNjMTVmY2Q1MjQxYzk4Yjg5YzkxNDI1OTM0OTgzIiwiaCI6Im11cm11cjY0In0=",
+            {
+                profile: "driving-car",
+                language: "en"
+            }
+        ),
+        routeWhileDragging: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        show: false,
+        lineOptions: {
+            styles: [{ color: "blue", weight: 5, opacity: 0.9 }]
         },
-        err => alert("GPS error: " + err.message),
-        {
-            enableHighAccuracy: true,   // ★ BEST ACCURACY
-            maximumAge: 0,             // no cached position
-            timeout: 5000              // retry fast
-        }
-    );
+        createMarker: () => null
+    }).addTo(map);
+
+    // when route is ready
+    routeControl.on("routesfound", e => {
+        const route = e.routes[0];
+        const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+        const timeMin = Math.round(route.summary.totalTime / 60);
+
+        const formatter = new L.Routing.Formatter();
+        const steps = formatter._getInstructions({ route: route });
+
+        let html = `<strong>Live Step-by-Step Directions:</strong><br><br>`;
+        steps.forEach(step => {
+            html += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
+        });
+
+        html += `<br><b>Total Distance:</b> ${distanceKm} km<br>`;
+        html += `<b>Estimated Time:</b> ${timeMin} mins`;
+
+        directionsList.innerHTML = html;
+    });
 }
+
+// Live GPS tracking
+navigator.geolocation.watchPosition(
+    pos => {
+        const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+        updateRoute(userLatLng);
+    },
+    err => alert("GPS error: " + err.message),
+    {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+    }
+);
+}
+
 window.onload = () => {
   loadListings();
 };
