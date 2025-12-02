@@ -448,7 +448,7 @@ function updateRoute(userLatLng) {
     // ★★★ ROUTING USING OPENROUTESERVICE ★★★
     routeControl = L.Routing.control({
         waypoints: [userLatLng, destinationLatLng],
-        router: L.Routing.openrouteservice(
+        router: L.Routing.openRouteService(
             "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjE1NTNjMTVmY2Q1MjQxYzk4Yjg5YzkxNDI1OTM0OTgzIiwiaCI6Im11cm11cjY0In0=",
             {
                 profile: "driving-car",
