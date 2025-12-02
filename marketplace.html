@@ -467,7 +467,9 @@ navigator.geolocation.watchPosition(
         const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
         updateRoute(userLatLng);
     },
-  err => { alert("Location tracking failed: " + err.message); }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 } ); } window.onload = () => { loadListings(); };
+ err => alert("Location tracking failed: " + err.message),
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000
+    } ); } window.onload = () => { loadListings(); };
 
 
 function openChat(contact, location, type, listingId) {
