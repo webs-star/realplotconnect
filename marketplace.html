@@ -469,7 +469,6 @@ function updateRoute(userLatLng) {
         directionsList.innerHTML = steps;
     });
 }
-
 // Watch user location
 navigator.geolocation.watchPosition(
     pos => {
@@ -478,12 +477,12 @@ navigator.geolocation.watchPosition(
     },
     err => alert("Location tracking failed: " + err.message),
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
-};
-  }
+); // ✅ properly closed
 
 window.onload = () => {
     loadListings();
 };
+
 
 
 function openChat(contact, location, type, listingId) {
