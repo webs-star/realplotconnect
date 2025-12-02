@@ -397,7 +397,11 @@ listingsDiv.appendChild(card);
   let userMarker = null;
   let routeControl = null;
 
+let straightLine = null; // store the line so we can remove it
+let routeControl = null;
+
 function updateRoute(userLatLng) {
+    // Update user marker
     if (userMarker) {
         userMarker.setLatLng(userLatLng);
     } else {
@@ -410,29 +414,33 @@ function updateRoute(userLatLng) {
         }).addTo(map).bindPopup("You are here");
     }
 
+    // Remove previous route
     if (routeControl) {
         map.removeControl(routeControl);
         routeControl = null;
     }
+    if (straightLine) {
+        map.removeLayer(straightLine);
+        straightLine = null;
+    }
 
     const straightDistance = map.distance(userLatLng, destinationLatLng);
 
-    // Hard threshold: within 10 meters = 0 m remaining
-    if (straightDistance <= 10) {
+    // Threshold for "at property"
+    if (straightDistance <= 30) { // 30 meters for GPS inaccuracy
         directionsList.innerHTML = `<strong>Distance to property:</strong> 0 m ✅`;
-        // Draw green line
-        L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
+        straightLine = L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
         return;
     }
 
-    // For 10–100 m: show straight line with actual meters
-    if (straightDistance <= 100) {
+    // For short distance < 300 m, just show straight line
+    if (straightDistance <= 300) {
         directionsList.innerHTML = `<strong>Distance to property:</strong> ${straightDistance.toFixed(0)} m`;
-        L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
+        straightLine = L.polyline([userLatLng, destinationLatLng], { color: "green", weight: 4, opacity: 0.6 }).addTo(map);
         return;
     }
 
-    // Farther away: use normal routing
+    // Farther away: use routing
     routeControl = L.Routing.control({
         waypoints: [userLatLng, destinationLatLng],
         routeWhileDragging: false,
@@ -449,9 +457,9 @@ function updateRoute(userLatLng) {
 
         let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
         const formatter = new L.Routing.Formatter();
-        route.instructions = route.instructions || formatter._getInstructions.call({options:{}}, route);
+        const instructions = formatter._getInstructions.call({ options: {} }, route);
 
-        for (const step of route.instructions) {
+        for (const step of instructions) {
             if (step.text) {
                 steps += `➡️ ${step.text} (${(step.distance / 1000).toFixed(2)} km)<br>`;
             }
@@ -463,16 +471,17 @@ function updateRoute(userLatLng) {
     });
 }
 
-    // Watch live location and update route
-    navigator.geolocation.watchPosition(
-        pos => {
-            const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-            updateRoute(userLatLng);
-        },
-        err => alert("Location tracking failed: " + err.message),
-        { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
-    );
-}
+// Watch user location
+navigator.geolocation.watchPosition(
+    pos => {
+        const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+        updateRoute(userLatLng);
+    },
+    err => alert("Location tracking failed: " + err.message),
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
+};
+  }
+
 window.onload = () => {
     loadListings();
 };
