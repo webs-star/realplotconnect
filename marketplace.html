@@ -230,6 +230,7 @@ ul.description {
 <div id="listings"></div>
 
 <script>
+ let straightLine = null; // global per map instance
   const firebaseConfig = {
     apiKey: "AIzaSyDLTAd2u0IlhA4Gm4-0tTSzLUDHFYj045g",
     authDomain: "realestate-afbe6.firebaseapp.com",
@@ -367,7 +368,6 @@ listingsDiv.appendChild(card);
   });
 }
 
-
 function showMapForListing(destLat, destLng, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
@@ -477,8 +477,6 @@ function showMapForListing(destLat, destLng, containerId) {
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
     );
 }
-
-
  
 window.onload = () => {
     loadListings();
