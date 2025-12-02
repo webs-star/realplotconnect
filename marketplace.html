@@ -368,7 +368,6 @@ listingsDiv.appendChild(card);
 }
 
 
-
 function showMapForListing(destLat, destLng, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -385,7 +384,7 @@ function showMapForListing(destLat, destLng, containerId) {
   directionsList.style.padding = "10px";
   directionsList.style.background = "#f9f9f9";
   directionsList.style.borderRadius = "8px";
-  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Attempting to get high-accuracy location...</em>"; 
+  directionsList.innerHTML = "<strong>Directions:</strong><br><em>Loading...</em>";
   container.appendChild(directionsList);
 
   const map = L.map(mapDiv).setView([destLat, destLng], 13);
@@ -396,30 +395,9 @@ function showMapForListing(destLat, destLng, containerId) {
 
   let userMarker = null;
   let routeControl = null;
-  
-  // Define the accuracy threshold for high-quality routing
-  const ACCURACY_THRESHOLD = 50; // meters
 
-  // The core function that calculates the route and updates the map
-  function updateRoute(userLatLng, accuracyMeters) {
-    
-    // 1. GPS Accuracy Check & User Feedback
-    if (accuracyMeters > ACCURACY_THRESHOLD) {
-      directionsList.innerHTML = `
-        ⚠️ **Improving Location...**<br>
-        Your current GPS accuracy is too low (**${accuracyMeters.toFixed(0)}m**). 
-        Please move to an open area or wait for a better signal.
-      `;
-      return; // Stop if accuracy is poor
-    }
-    
-    // Update loading message for slow connections before routing starts
-    directionsList.innerHTML = `
-      ⏳ **Calculating route...**<br>
-      On slow connections, this may take up to 25 seconds. Please wait.
-    `;
-    
-    // 2. Update User Marker
+  function updateRoute(userLatLng) {
+    // Start route calculation immediately upon receiving *any* position fix
     if (userMarker) {
       userMarker.setLatLng(userLatLng);
     } else {
@@ -429,23 +407,18 @@ function showMapForListing(destLat, destLng, containerId) {
           iconSize: [25, 25],
           iconAnchor: [12, 12]
         })
-      }).addTo(map).bindPopup("You are here (Accuracy: " + accuracyMeters.toFixed(0) + "m)");
+      }).addTo(map).bindPopup("You are here");
     }
 
     if (routeControl) {
       map.removeControl(routeControl);
     }
+    
+    // Explicitly update the directions list to show we are waiting for the server
+    directionsList.innerHTML = "<strong>Directions:</strong><br><em>Calculating route...</em>";
 
-    // 3. Create Routing Control with Timeout and Explicit Router
     routeControl = L.Routing.control({
       waypoints: [userLatLng, destinationLatLng],
-      
-      // Explicitly set the OSRM router and the longer timeout for stability
-      router: L.Routing.osrmv1({
-        serviceUrl: 'https://router.project-osrm.org/route/v1',
-        timeout: 25000 // Increased timeout to 25 seconds for 3G/slow connections
-      }), 
-      
       routeWhileDragging: false,
       addWaypoints: false,
       createMarker: () => null,
@@ -454,18 +427,15 @@ function showMapForListing(destLat, destLng, containerId) {
         styles: [{ color: 'blue', weight: 4, opacity: 0.8 }]
       }
     }).addTo(map);
-
-    // 4. Add Routing Error Handler (catches network issues and timeouts)
-    routeControl.on('routingerror', function (e) {
-      console.error("Routing Error:", e.error);
+    
+    // ⭐ NEW: Add routing error handler (the only robust addition needed)
+    routeControl.on('routingerror', function (e) {
       directionsList.innerHTML = `
-        ❌ <strong>Failed to load directions.</strong><br>
-        **Error:** ${e.error.message || "Unknown server error."}<br>
-        <em>Try checking your connection or wait a moment for the server to respond.</em>
+        ❌ <strong>Failed to load route.</strong><br>
+        **Error:** ${e.error.message || "Routing server timeout or network issue."}<br>
       `;
     });
 
-    // 5. Routes Found Success Logic
     routeControl.on('routesfound', function (e) {
       const route = e.routes[0];
       const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
@@ -474,6 +444,7 @@ function showMapForListing(destLat, destLng, containerId) {
       let steps = `<strong>Live Step-by-Step Directions:</strong><br>`;
       const instructions = route.instructions || [];
 
+      // Leaflet sometimes leaves instructions empty, fix it manually
       const formatter = new L.Routing.Formatter();
       if (instructions.length === 0 && route.instructions === undefined) {
         const legs = route.instructions = formatter._getInstructions.call({options:{}}, route);
@@ -485,33 +456,34 @@ function showMapForListing(destLat, destLng, containerId) {
         }
       }
 
-      steps += `<br><em>Total Distance:</em> **${distanceKm} km**<br>`;
-      steps += `<em>Estimated Time:</em> **${timeMin} mins**`;
+      steps += `<br><em>Total Distance:</em> ${distanceKm} km<br>`;
+      steps += `<em>Estimated Time:</em> ${timeMin} mins`;
 
       directionsList.innerHTML = steps;
     });
   }
 
-  // 6. Watch live location and update route
+  // Watch live location and update route
   navigator.geolocation.watchPosition(
     pos => {
       const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      const accuracyMeters = pos.coords.accuracy;
-      updateRoute(userLatLng, accuracyMeters);
+      updateRoute(userLatLng);
     },
     err => {
-      directionsList.innerHTML = `❌ **Location Error:** ${err.message}. Please enable location services.`;
-      alert("Location tracking failed: " + err.message);
+      // ⭐ FIX: Display Geolocation error on the screen instead of just an alert
+      directionsList.innerHTML = `
+        ❌ **Location Tracking Failed!**<br>
+        The device could not get your position within 7 seconds. Please check your location settings/signal.
+      `;
+      // alert("Location tracking failed: " + err.message); // Keep this commented out or remove it
     },
     {
       enableHighAccuracy: true,
-      maximumAge: 0, 
-      // Increased Geolocation timeout for slow networks
-      timeout: 15000 
+      maximumAge: 3000,
+      timeout: 7000
     }
   );
 }
-
  
 window.onload = () => { loadListings(); };
 
