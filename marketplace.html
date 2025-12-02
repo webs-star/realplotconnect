@@ -499,6 +499,9 @@ function updateRoute(userLatLng) {
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 }
     );
 }
+window.onload = () => {
+    loadListings();
+};
 
 
 function openChat(contact, location, type, listingId) {
